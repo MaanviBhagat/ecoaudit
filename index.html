@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sustainable Solutions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    body {
+      background-color: #f0fff0;
+      color: #2e7d32;
+    }
+
+    header {
+      background-color: #a5d6a7;
+      padding: 1.5rem;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #1b5e20;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .nav-links li a {
+      text-decoration: none;
+      color: #1b5e20;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+
+    .nav-links li a:hover {
+      background-color: #81c784;
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 3rem 1rem;
+      background: linear-gradient(to right, #e8f5e9, #c8e6c9);
+    }
+
+    .hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      max-width: 600px;
+    }
+
+    .cta-button {
+      background-color: #388e3c;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .cta-button:hover {
+      background-color: #2e7d32;
+    }
+
+    .info-section {
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .info-section h3 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-section p {
+      font-size: 1rem;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      padding: 2rem;
+    }
+
+    .feature-box {
+      background-color: #c8e6c9;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .feature-box:hover {
+      transform: scale(1.02);
+    }
+
+    .feature-box h4 {
+      margin-bottom: 0.5rem;
+      color: #1b5e20;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #a5d6a7;
+      color: #1b5e20;
+    }
+
+    @media (max-width: 600px) {
+      .hero h2 {
+        font-size: 1.8rem;
+      }
+
+      .nav-links {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav class="navbar">
+      <div class="logo">🌱 Sustainable Solutions</div>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#setup">Setup Wizard</a></li>
+        <li><a href="#tools">Tools</a></li>
+        <li><a href="#forum">Community</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <section class="hero">
+      <h2>Live Greener. Live Smarter.</h2>
+      <p>Your guide to building an eco-conscious home and lifestyle aligned with UN Sustainable Development Goals.</p>
+      <a href="#setup" class="cta-button">Get Started</a>
+    </section>
+  </header>
+
+  <main>
+    <section class="info-section">
+      <h3>Why Choose Sustainable Solutions?</h3>
+      <p>We help you make informed lifestyle choices—from setting up your homestead to tracking your zero-waste goals—while keeping sustainability at the heart of everything.</p>
+    </section>
+
+    <section class="features-grid" id="tools">
+      <div class="feature-box"><h4>🏠 Home Setup Wizard</h4></div>
+      <div class="feature-box"><h4>📚 Learning Center</h4></div>
+      <div class="feature-box"><h4>📊 Green Score Dashboard</h4></div>
+      <div class="feature-box"><h4>🌿 Eco Directory</h4></div>
+      <div class="feature-box"><h4>💬 Community Forum</h4></div>
+      <div class="feature-box"><h4>♻️ Waste & Water Tools</h4></div>
+      <div class="feature-box"><h4>📈 EcoAudit – MSME Dashboard</h4></div>
+      <div class="feature-box"><h4>🌾 How to Set Up a Homestead</h4></div>
+      <div class="feature-box"><h4>⚗️ Safe Wastewater & Chemical Disposal</h4></div>
+      <div class="feature-box"><h4>🚰 Smart Water Usage Tips</h4></div>
+      <div class="feature-box"><h4>🌧️ Rainwater Harvesting</h4></div>
+      <div class="feature-box"><h4>🔌 Energy Starter Wizard</h4></div>
+      <div class="feature-box"><h4>🌞 Renewable Energy Integration Guide</h4></div>
+      <div class="feature-box"><h4>🏡 Smart Home Energy Planner</h4></div>
+      <div class="feature-box"><h4>🤖 Eco-Tech Explorer</h4></div>
+      <div class="feature-box"><h4>🚲 Green Commute Planner</h4></div>
+      <div class="feature-box"><h4>🏙️ Urban Eco-Living Tips</h4></div>
+      <div class="feature-box"><h4>🧺 Zero Waste Tracker</h4></div>
+      <div class="feature-box"><h4>📣 Citizen Reporting & Awareness App</h4></div>
+      <div class="feature-box"><h4>🔍 Green Product Scanner</h4></div>
+      <div class="feature-box"><h4>🥗 Nutrition Label Scanner</h4></div>
+      <div class="feature-box"><h4>💧 Water Guidance Module</h4></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Sustainable Solutions. Built with 💚 for a greener tomorrow.</p>
+  </footer>
+
+</body>
+</html>
