@@ -239,7 +239,19 @@ const SHOP_BADGES = [
   { id: "shop_champion", icon: "🏆", title: "Eco Champion Title", desc: "Unlocks the prestigious Eco Champion profile title", cost: 400 }
 ];
 
-// Load existing wizard + gamification state
+// Helpers to get current Day key ("YYYY-MM-DD") and Monday-based Week key ("YYYY-Www")
+function getTodayKey() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+
+function getWeekKey() {
+  const d = new Date();
+  const day = d.getDay() || 7; // Make Sunday = 7 so Monday = 1
+  d.setDate(d.getDate() - day + 1); // Snap to Monday of current week
+  return d.getFullYear() + "-W" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+
 let raw = {};
 try { raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch (e) {}
 
@@ -248,8 +260,14 @@ let state = {
   steps: raw.steps || {},
   substeps: raw.substeps || {},
   doneStages: raw.doneStages || {},
-  completedMissions: raw.completedMissions || {}, // { missionId: pts }
-  purchasedBadges: raw.purchasedBadges || {},     // { badgeId: cost }
+  // Cumulative lifetime mission points (never lost when missions refresh)
+  lifetimeMissionPts: raw.lifetimeMissionPts || Object.values(raw.completedMissions || {}).reduce((s, p) => s + p, 0),
+  lifetimeMissionsDone: raw.lifetimeMissionsDone || Object.keys(raw.completedMissions || {}).length,
+  dailyDate: raw.dailyDate || getTodayKey(),
+  dailyDone: raw.dailyDone || {},
+  weeklyDate: raw.weeklyDate || getWeekKey(),
+  weeklyDone: raw.weeklyDone || {},
+  purchasedBadges: raw.purchasedBadges || {},
   spentPoints: raw.spentPoints || 0,
   ecoPoints: raw.ecoPoints || 0,
   carbonCoins: raw.carbonCoins || 0,
@@ -257,23 +275,37 @@ let state = {
   badges: raw.badges || []
 };
 
+// Auto-refresh Daily & Weekly missions when a new day or new Monday begins
+function checkMissionResets() {
+  const today = getTodayKey();
+  const thisWeek = getWeekKey();
+
+  if (state.dailyDate !== today) {
+    state.dailyDate = today;
+    state.dailyDone = {};
+  }
+  if (state.weeklyDate !== thisWeek) {
+    state.weeklyDate = thisWeek;
+    state.weeklyDone = {};
+  }
+}
+
 let activeTab = "daily";
 
-// Greet logged-in user if present
 try {
   const user = JSON.parse(localStorage.getItem("greenAuthCurrentUser") || "null");
   if (user && user.email) {
-    const name = user.email.split("@")[0];
-    document.getElementById("greeting").textContent = "Hi, " + name + "!";
+    document.getElementById("greeting").textContent = "Hi, " + user.email.split("@")[0] + "!";
   }
 } catch (e) {}
 
 function recalculateAndSave() {
+  checkMissionResets();
+
   const wizardStepPts = Object.values(state.steps).reduce((s, item) => s + (item.points || 0), 0);
   const wizardStagePts = Object.keys(state.doneStages).length * 50;
-  const missionPts = Object.values(state.completedMissions).reduce((s, p) => s + p, 0);
 
-  const totalEarned = wizardStepPts + wizardStagePts + missionPts;
+  const totalEarned = wizardStepPts + wizardStagePts + state.lifetimeMissionPts;
   const totalSpent = Object.values(state.purchasedBadges).reduce((s, c) => s + c, 0);
 
   state.spentPoints = totalSpent;
@@ -281,17 +313,15 @@ function recalculateAndSave() {
   state.carbonCoins = Math.floor(totalEarned / 15);
   state.level = Math.floor(totalEarned / 200) + 1;
 
-  // Auto-earned milestone badges
   const autoBadges = [];
   if (Object.keys(state.steps).length >= 1) autoBadges.push("🌱 First Blueprint Step");
   if (Object.keys(state.steps).length >= 6) autoBadges.push("🏡 Eco Architect");
   if (Object.keys(state.doneStages).length === 5) autoBadges.push("🏗️ Sustainable Home Master");
-  if (Object.keys(state.completedMissions).length >= 3) autoBadges.push("⚡ Mission Streaker");
+  if (state.lifetimeMissionsDone >= 3) autoBadges.push("⚡ Mission Streaker");
   state.badges = autoBadges;
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
-  // Update Hero UI
   document.getElementById("availPoints").textContent = state.ecoPoints;
   document.getElementById("earnedPoints").textContent = totalEarned;
   document.getElementById("carbonCoins").textContent = state.carbonCoins;
@@ -304,10 +334,10 @@ function recalculateAndSave() {
   document.getElementById("levelFill").style.width = `${(progressInLevel / 200) * 100}%`;
 }
 
-function renderMissions(list, label) {
-  const doneCount = list.filter(m => state.completedMissions[m.id]).length;
+function renderMissions(list, doneMap, type, label, resetNote) {
+  const doneCount = list.filter(m => doneMap[m.id]).length;
   const rows = list.map(m => {
-    const isDone = !!state.completedMissions[m.id];
+    const isDone = !!doneMap[m.id];
     return `
       <div class="mission-card ${isDone ? "done" : ""}">
         <div class="mission-left">
@@ -318,16 +348,19 @@ function renderMissions(list, label) {
             <span class="pts-tag">🌱 +${m.pts} Eco Points</span>
           </div>
         </div>
-        <button type="button" class="action-btn ${isDone ? "completed" : ""}" onclick="completeMission('${m.id}', ${m.pts})">
+        <button type="button" class="action-btn ${isDone ? "completed" : ""}" onclick="completeMission('${type}', '${m.id}', ${m.pts})">
           ${isDone ? "Completed ✓" : "Complete"}
         </button>
       </div>`;
   }).join("");
 
   return `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-      <h2 class="section-title" style="margin:0;">${label}</h2>
-      <span style="font-size:13px; color:var(--muted); font-weight:600;">${doneCount}/${list.length} completed</span>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+      <div>
+        <h2 class="section-title" style="margin:0;">${label}</h2>
+        <span style="font-size:12.5px; color:var(--muted);">${resetNote}</span>
+      </div>
+      <span style="font-size:13px; color:var(--green-dark); font-weight:600;">${doneCount}/${list.length} completed</span>
     </div>
     <div class="mission-list">${rows}</div>`;
 }
@@ -336,13 +369,11 @@ function renderBadgesAndShop() {
   const earnedCards = state.badges.length
     ? state.badges.map(b => {
         const parts = b.split(" ");
-        const emoji = parts[0];
-        const name = parts.slice(1).join(" ");
         return `
           <div class="badge-card owned">
             <div>
-              <div class="b-emoji">${emoji}</div>
-              <h4>${name}</h4>
+              <div class="b-emoji">${parts[0]}</div>
+              <h4>${parts.slice(1).join(" ")}</h4>
               <p>Unlocked via Home Setup & Missions</p>
             </div>
             <span class="owned-pill">Earned ✓</span>
@@ -362,7 +393,7 @@ function renderBadgesAndShop() {
         </div>
         ${owned
           ? `<span class="owned-pill">Unlocked ✓</span>`
-          : `<button type="button" class="buy-btn" ${canAfford ? "" : "disabled"} onclick="buyBadge('${item.id}', ${item.cost})">
+          : `<button type="button" class="buy-btn" ${canAfford ? "" : "disabled"} onclick="buyBadge('${item.id}',${item.cost})">
                Redeem • ${item.cost} pts
              </button>`
         }
@@ -372,7 +403,6 @@ function renderBadgesAndShop() {
   return `
     <h2 class="section-title">Milestone Badges Earned (${state.badges.length})</h2>
     <div class="badges-grid">${earnedCards}</div>
-
     <h2 class="section-title">Badge & Title Shop (Redeem Eco Points)</h2>
     <div class="badges-grid">${shopCards}</div>`;
 }
@@ -380,14 +410,22 @@ function renderBadgesAndShop() {
 function render() {
   recalculateAndSave();
   const container = document.getElementById("tabContent");
-  if (activeTab === "daily") container.innerHTML = renderMissions(DAILY_MISSIONS, "Daily Eco-Missions");
-  else if (activeTab === "weekly") container.innerHTML = renderMissions(WEEKLY_MISSIONS, "Weekly Sustainability Goals");
-  else container.innerHTML = renderBadgesAndShop();
+  if (activeTab === "daily") {
+    container.innerHTML = renderMissions(DAILY_MISSIONS, state.dailyDone, "daily", "Daily Eco-Missions", "Refreshes automatically every day at midnight");
+  } else if (activeTab === "weekly") {
+    container.innerHTML = renderMissions(WEEKLY_MISSIONS, state.weeklyDone, "weekly", "Weekly Sustainability Goals", "Refreshes automatically every Monday");
+  } else {
+    container.innerHTML = renderBadgesAndShop();
+  }
 }
 
-window.completeMission = (id, pts) => {
-  if (state.completedMissions[id]) return;
-  state.completedMissions[id] = pts;
+window.completeMission = (type, id, pts) => {
+  const doneMap = type === "daily" ? state.dailyDone : state.weeklyDone;
+  if (doneMap[id]) return;
+
+  doneMap[id] = true;
+  state.lifetimeMissionPts += pts;
+  state.lifetimeMissionsDone += 1;
   render();
 };
 
