@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home Setup Wizard</title>
+<style>
+  :root {
+    --bg: #f4f9f5; --surface: #fff; --ink: #14281c; --muted: #5c7164;
+    --border: #cfe0d4; --green: #2e7d4f; --green-dark: #1f5c3a; --soft: #e6f4ea;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding-bottom: 80px; background: var(--bg); color: var(--ink);
+    font-family: system-ui, -apple-system, sans-serif; font-size: 15px; line-height: 1.5;
+  }
+  header, footer {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 14px 28px; display: flex; justify-content: space-between; align-items: center;
+  }
+  footer { position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid var(--border); border-bottom: 0; z-index: 10; }
+  .brand { font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+  .brand::before { content: ""; width: 14px; height: 14px; background: var(--green); border-radius: 0 100% 0 100%; }
+  .badge { background: var(--soft); border: 1px solid var(--border); color: var(--green-dark); padding: 5px 12px; border-radius: 99px; font-weight: 600; font-size: 13px; }
+  main { max-width: 840px; margin: 0 auto; padding: 32px 20px; }
+  .bar { height: 8px; background: var(--soft); border-radius: 99px; overflow: hidden; margin: 10px 0 24px; }
+  .bar div { height: 100%; background: var(--green); transition: width .25s; }
+  h1 { margin: 0 0 6px; font-size: 25px; }
+  .sub { color: var(--muted); margin: 0 0 22px; font-size: 14px; }
+
+  /* Step Card & Sub-steps */
+  .checklist { display: flex; flex-direction: column; gap: 14px; }
+  .step-card {
+    background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 16px 18px; transition: border-color .15s, background .15s;
+  }
+  .step-card.done { border-color: var(--green); background: var(--soft); }
+  .step-header { display: flex; align-items: flex-start; gap: 14px; cursor: pointer; }
+  .check {
+    width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--green);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+    font-weight: 700; color: #fff; background: var(--surface); font-size: 13px;
+  }
+  .step-card.done .check { background: var(--green); }
+  .step-body { flex: 1; }
+  .step-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+  .step-top h3 { margin: 0; font-size: 16px; }
+  .step-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+  .meta { color: var(--muted); font-size: 13.5px; margin: 0 0 6px; }
+  .spec { font-size: 12.5px; color: var(--green-dark); font-weight: 600; }
+
+  /* Video Toggle & Responsive Embed */
+  .vid-btn {
+    background: var(--surface); border: 1px solid var(--green); color: var(--green-dark);
+    padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; cursor: pointer;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .vid-btn:hover, .vid-btn.open { background: var(--green); color: #fff; }
+  .video-box {
+    margin: 12px 0 0 36px; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border); background: #14281c;
+  }
+  .video-wrap {
+    position: relative; padding-bottom: 52%; height: 0; background: #000;
+  }
+  .video-wrap iframe {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
+  }
+  .video-bar {
+    padding: 8px 12px; background: var(--soft); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--muted);
+  }
+  .video-bar a { color: var(--green-dark); font-weight: 600; text-decoration: none; }
+  .video-bar a:hover { text-decoration: underline; }
+
+  /* Sub-steps list */
+  .substeps {
+    margin: 12px 0 0 36px; padding-top: 10px; border-top: 1px dashed var(--border);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .substep {
+    display: flex; align-items: center; gap: 10px; font-size: 13.5px;
+    color: var(--ink); cursor: pointer; padding: 4px 6px; border-radius: 6px;
+  }
+  .substep:hover { background: rgba(46, 125, 79, 0.06); }
+  .sub-box {
+    width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--green);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    font-size: 11px; font-weight: 700; color: #fff; background: var(--surface);
+  }
+  .substep.checked .sub-box { background: var(--green); }
+  .substep.checked span { text-decoration: line-through; color: var(--muted); }
+
+  /* Output / Blueprint Screen */
+  .summary-box {
+    background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 26px;
+  }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 20px 0; }
+  .stat { background: var(--soft); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+  .stat strong { display: block; font-size: 24px; color: var(--green-dark); }
+  .stat span { font-size: 12.5px; color: var(--muted); }
+  .badges-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 22px; }
+  .report-group { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .report-group h4 { margin: 0 0 6px; color: var(--green-dark); }
+  .report-group ul { margin: 0; padding-left: 20px; font-size: 14px; }
+
+  button, .btn {
+    padding: 8px 16px; border-radius: 8px; font: inherit; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--ink); text-decoration: none;
+  }
+  .primary { background: var(--green); color: #fff; border-color: var(--green); }
+  .primary:hover { background: var(--green-dark); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  @media (max-width: 600px) {
+    .substeps, .video-box { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">Home Setup Wizard</div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <span class="badge">🌱 <span id="pts">0</span> Eco Points</span>
+      <a href="io.html" class="btn">Back</a>
+    </div>
+  </header>
+
+  <main>
+    <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted);">
+      <span id="phaseLabel">Stage 1 of 5</span>
+      <span>+50 Bonus Pts per completed stage</span>
+    </div>
+    <div class="bar"><div id="fill"></div></div>
+    <div id="view"></div>
+  </main>
+
+  <footer>
+    <button id="prev">← Previous</button>
+    <span id="status" class="meta" style="margin:0;">0 steps completed</span>
+    <button id="next" class="primary">Complete Stage & Next →</button>
+  </footer>
+
+<script>
+const STORAGE_KEY = "greenAuthGamification_v2";
+
+// [Stage Title, Subtitle, [[Step Title, Overview, Upfront Advantage, Points, [Sub-steps...], youtubeVideoId], ...]]
+const STAGES = [
+  ["🧱 1. Walls, Paint & Thermal Envelope", "Get wall finishes and insulation right before painting—repainting or re-plastering later costs 3x more", [
+    ["Paint with Zero-VOC / Low-VOC Eco-Paint from Day One", "Costs only ₹20–50/L more during initial painting, whereas stripping chemical paint later requires full sanding and vacating rooms.", "₹300–500/L • Avoids costly repainting", 50, [
+      "Choose certified Zero-VOC water-based primer and interior emulsion",
+      "Use breathable natural lime-wash or clay plaster on bedroom walls",
+      "Ventilate rooms for 48 hours before moving in mattresses or curtains"
+    ], "YKuppEvsLyU"],
+    ["Build with AAC Blocks, Fly-Ash Bricks & Reclaimed Wood", "Choosing insulated blocks and reclaimed frames during construction eliminates expensive wall retrofits later.", "Same civil cost • 15–20% cooler indoors", 70, [
+      "Use Autoclaved Aerated Concrete (AAC) blocks for exterior sun-facing walls",
+      "Source FSC-certified or reclaimed timber for door frames and window sills",
+      "Seal door/window perimeters with acoustic & thermal weather-stripping"
+    ], "ygvmU4V0Qu8"],
+    ["Set up Passive Cross-Ventilation & Cool Roof Coating", "Adding roof reflective coats and high vents during setup prevents lifelong AC dependency.", "₹25–40/sq.ft • Cuts indoor heat 3–5°C", 60, [
+      "Apply high-SRI white solar-reflective coating on the bare terrace before placing tanks",
+      "Install operable top-hung transom vents above doors for natural stack airflow",
+      "Fit exterior bamboo chicks or overhangs on west-facing windows"
+    ], "pubzPXG0HNs"]
+  ]],
+  ["💡 2. Built-In Lighting, Fans & Room Wiring", "Pick efficient fixtures and smart switchboards during initial fitting instead of replacing brand-new fans and bulbs later", [
+    ["Install BLDC Ceiling Fans & LED Fixtures at Setup", "Buying 28W BLDC fans upfront costs almost the same as standard fans, saving the full cost of buying twice.", "₹1,500–3,000/fan • 65% less power", 55, [
+      "Install 5-star 28W BLDC fans in all bedrooms and living areas from day one",
+      "Fit warm-white (3000K) LEDs in bedrooms and cool-white (4000K) in study/kitchens",
+      "Wire motion-sensor LED lights in corridors, staircases, and washrooms"
+    ], "Z-GsNXuTYs4"],
+    ["Include Master-Cutoff & Timer Switches in Switchboards", "Adding smart/timer modules while wiring switchboards avoids breaking wall plaster later.", "₹500–1,000/switch • Cuts 10% standby drain", 45, [
+      "Wire dedicated master-cutoff switches for living room entertainment and router hubs",
+      "Install digital timer switches for bathroom geysers and kitchen appliances",
+      "Position work desks near windows to maximize natural daylight without daytime bulbs"
+    ], ""]
+  ]],
+  ["🛏️ 3. Bedroom & Living Room Furnishing", "Invest once in solid, non-toxic furniture and mattresses rather than replacing cheap off-gassing MDF and foam", [
+    ["Choose Solid FSC Wood or Upcycled Furniture", "Solid or reclaimed wood lasts decades, whereas engineered MDF swells and releases formaldehyde glues.", "Long-term savings • Zero VOCs", 60, [
+      "Pick solid teak, mango, acacia, or reclaimed wood beds, dining tables, and wardrobes",
+      "Ask carpenters to finish wood with natural beeswax or linseed oil instead of toxic PU",
+      "Keep tall wardrobes against internal walls so window light reaches deep into rooms"
+    ], ""],
+    ["Buy Natural Latex, Coir, or Organic Cotton Mattresses", "Buying a chemical-free mattress upfront avoids discarding synthetic foam mattresses after 3–4 years.", "₹10,000–30,000 • Lasts 12–15 years", 65, [
+      "Select natural Dunlop latex, coconut coir, or organic cotton mattresses",
+      "Pair with GOTS-certified organic cotton or bamboo bedsheets and pillows",
+      "Hang heavy cotton/linen thermal curtains to block afternoon heat naturally"
+    ], "6mm9JEOxWr0"],
+    ["Set up Indoor Air-Purifying Plant Corners", "Establish ceramic planters and natural soil mixes right away to filter new-home paint and polish fumes.", "₹100–500/plant • Cleaner indoor air", 30, [
+      "Place Snake Plants and Peace Lilies in bedrooms for continuous air purification",
+      "Add Areca Palms in living room corners potted in lightweight coco-peat mix",
+      "Use breathable terracotta or ceramic pots with drip trays instead of plastic"
+    ], ""]
+  ]],
+  ["🍳 4. Kitchen & Built-In Waste Workflow", "Design under-sink sorting, composting, and plastic-free storage while organizing the kitchen from scratch", [
+    ["Build a 3-Bin Segregation Pull-Out Under the Sink", "Allocating cabinet space for 3 bins during kitchen setup prevents messy countertop bins later.", "₹300–600 • 100% waste sorting", 40, [
+      "Dedicate under-sink pull-out space for Green (Wet), Blue (Dry), and Red (Reject) bins",
+      "Line wet bins with newspaper or compostable bags instead of black plastic",
+      "Set up a wall-mounted dry-box for clean cardboard, paper, and glass jars"
+    ], "bQW5-jgghvc"],
+    ["Set up an Aerobic Kitchen Composting Station", "Starting a ventilated compost bin from day one keeps wet waste out of landfills effortlessly.", "₹500–2,000 • Cuts landfill waste 60%", 60, [
+      "Place a stackable terracotta Khamba or ventilated compost drum in the utility/balcony",
+      "Keep a sealed container of dry browns (cocopeat/dried leaves) right next to it",
+      "Layer daily kitchen peels with browns and microbial starter every 2 days"
+    ], "ukezInCg4k8"],
+    ["Stock Pantry with Glass & Stainless Steel Jars", "Buying uniform glass/steel containers upfront avoids buying plastic sets only to replace them later.", "₹1,000–2,500 • Toxin-free pantry", 35, [
+      "Organize grains, pulses, and spices in airtight glass or stainless-steel canisters",
+      "Choose cast-iron, stainless steel, or clay cookware instead of peeling non-stick pans",
+      "Keep cloth produce bags and steel dabbas ready for zero-plastic grocery runs"
+    ], ""]
+  ]],
+  ["🧺 5. Utility, Laundry & Balcony Setup", "Set up passive solar drying and self-sustaining balcony greenery during initial move-in", [
+    ["Mount a Ceiling Solar Pulley Dryer in the Utility", "Installing ceiling pulley rods at setup eliminates the cost and power bill of an electric clothes dryer.", "₹500–1,200 • Zero drying electricity", 40, [
+      "Drill and mount stainless-steel pulley drying rods in a sunny, breezy utility/balcony",
+      "Stock durable bamboo or stainless-steel pegs instead of brittle plastic clips",
+      "Configure washing machine default cycle to Cold Water (30°C) with plant-safe detergent"
+    ], "VqXqqT6WBd8"],
+    ["Set up Upcycled Balcony Herb Beds & Drip Lines", "Laying simple drip tubing and hardy herbs at move-in creates an effortless, self-watered green corner.", "₹500–2,000 • Saves 60% plant water", 45, [
+      "Run simple 16mm micro-drip tubing along balcony railings with adjustable drippers",
+      "Plant hardy kitchen herbs (tulsi, mint, curry leaves, lemongrass) in compost-enriched soil",
+      "Place dusk-to-dawn solar wall lamps on the balcony railing where they get 5+ hrs sun"
+    ], "VIgrJBkw9mE"]
+  ]]
+];
+
+let raw = {};
+try { raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch (e) {}
+
+let state = {
+  stage: (typeof raw.stage === "number" && raw.stage >= 0 && raw.stage <= STAGES.length) ? raw.stage : 0,
+  steps: (raw.steps && typeof raw.steps === "object") ? raw.steps : {},
+  substeps: (raw.substeps && typeof raw.substeps === "object") ? raw.substeps : {},
+  doneStages: (raw.doneStages && typeof raw.doneStages === "object") ? raw.doneStages : {},
+  ecoPoints: 0,
+  carbonCoins: 0,
+  level: 1,
+  badges: []
+};
+
+let openVideos = {};
+
+function save() {
+  const stepPts = Object.values(state.steps).reduce((sum, s) => sum + (s.points || 0), 0);
+  const stagePts = Object.keys(state.doneStages).length * 50;
+  state.ecoPoints = stepPts + stagePts;
+  state.carbonCoins = Math.floor(state.ecoPoints / 15);
+  state.level = Math.floor(state.ecoPoints / 200) + 1;
+
+  const badges = [];
+  const stepCount = Object.keys(state.steps).length;
+  const stageCount = Object.keys(state.doneStages).length;
+  if (stepCount >= 1) badges.push("🌱 First Blueprint Step");
+  if (stepCount >= 6) badges.push("🏡 Eco Architect");
+  if (stageCount >= 3) badges.push("✨ Smart Home Planner");
+  if (stageCount === STAGES.length) badges.push("🏆 Sustainable Home Master");
+  state.badges = badges;
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function renderSummary() {
+  const view = document.getElementById("view");
+  const totalTasks = STAGES.reduce((acc, s) => acc + s[2].length, 0);
+  const completedCount = Object.keys(state.steps).length;
+
+  const breakdownHtml = STAGES.map((stage, sIdx) => {
+    const doneInStage = stage[2].filter((_, tIdx) => state.steps[`${sIdx}_${tIdx}`]);
+    if (!doneInStage.length) return "";
+    return `
+      <div class="report-group">
+        <h4>${stage[0]} (${doneInStage.length}/${stage[2].length} completed)</h4>
+        <ul>
+          ${doneInStage.map(t => `<li><strong>${t[0]}</strong> — +${t[3]} pts <span style="color:var(--muted)">(${t[2]})</span></li>`).join("")}
+        </ul>
+      </div>`;
+  }).join("");
+
+  const badgesHtml = state.badges.length
+    ? state.badges.map(b => `<span class="badge">${b}</span>`).join("")
+    : `<span class="meta">Complete at least 1 step to unlock your first badge!</span>`;
+
+  view.innerHTML = `
+    <div class="summary-box">
+      <h1 style="margin-bottom:4px;">🎉 Sustainable Home Setup Blueprint</h1>
+      <p class="sub" style="margin-bottom:14px;">Your day-one setup choices, points, and unlocked badges are saved for your Eco Missions & Rewards dashboard.</p>
+
+      <div class="stats-grid">
+        <div class="stat"><strong>${state.ecoPoints}</strong><span>Total Eco Points</span></div>
+        <div class="stat"><strong>${state.carbonCoins}</strong><span>Carbon Coins</span></div>
+        <div class="stat"><strong>Level ${state.level}</strong><span>Eco Builder Rank</span></div>
+        <div class="stat"><strong>${completedCount}/${totalTasks}</strong><span>Setup Steps Done</span></div>
+      </div>
+
+      <h3 style="margin:0 0 8px; font-size:16px;">Unlocked Achievements</h3>
+      <div class="badges-row">${badgesHtml}</div>
+
+      <h3 style="margin:0 0 12px; font-size:16px;">Your Completed Setup Plan</h3>
+      ${breakdownHtml || '<p class="meta">No setup steps checked off yet. Click <strong>← Previous</strong> to select steps in each room.</p>'}
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:20px;">
+        <button type="button" onclick="resetWizard()">Reset Progress</button>
+        <a href="io.html" class="btn primary">Continue to Insight Portal →</a>
+      </div>
+    </div>`;
+}
+
+function render() {
+  const isSummary = state.stage >= STAGES.length;
+  document.getElementById("pts").textContent = state.ecoPoints;
+  document.getElementById("status").textContent = `${Object.keys(state.steps).length} steps completed • Level ${state.level}`;
+  document.getElementById("prev").disabled = state.stage === 0;
+
+  if (isSummary) {
+    document.getElementById("phaseLabel").textContent = "Blueprint Complete";
+    document.getElementById("fill").style.width = "100%";
+    document.getElementById("next").textContent = "Back to Insight Portal →";
+    renderSummary();
+    return;
+  }
+
+  const [title, sub, tasks] = STAGES[state.stage];
+  document.getElementById("phaseLabel").textContent = `Stage ${state.stage + 1} of ${STAGES.length}`;
+  document.getElementById("fill").style.width = `${((state.stage + 1) / STAGES.length) * 100}%`;
+  document.getElementById("next").textContent = state.stage === STAGES.length - 1 ? "Finish Home Setup ✓" : "Complete Stage & Next →";
+
+  const listHtml = tasks.map(([name, guide, spec, points, substeps, videoId], i) => {
+    const id = `${state.stage}_${i}`;
+    const done = !!state.steps[id];
+    const isVidOpen = !!openVideos[id];
+
+    const subHtml = substeps.map((subText, sIdx) => {
+      const subId = `${id}_${sIdx}`;
+      const subDone = !!state.substeps[subId];
+      return `
+        <div class="substep ${subDone ? "checked" : ""}" onclick="event.stopPropagation(); toggleSub('${id}', '${subId}', '${name.replace(/'/g, "\\'")}', ${points}, ${substeps.length})">
+          <div class="sub-box">${subDone ? "✓" : ""}</div>
+          <span>${subText}</span>
+        </div>`;
+    }).join("");
+
+    const videoBtnHtml = videoId
+      ? `<button type="button" class="vid-btn ${isVidOpen ? "open" : ""}" onclick="event.stopPropagation(); toggleVideo('${id}')">${isVidOpen ? "✕ Close Video" : "▶ Watch Guide"}</button>`
+      : "";
+
+    const videoEmbedHtml = (videoId && isVidOpen)
+      ? `<div class="video-box" onclick="event.stopPropagation()">
+           <div class="video-wrap">
+             <iframe src="https://www.youtube-nocookie.com/embed/${videoId}?rel=0" title="${name} Video Guide" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+           </div>
+           <div class="video-bar">
+             <span>If embed is blocked on local file://, open directly:</span>
+             <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener">↗ Watch on YouTube</a>
+           </div>
+         </div>`
+      : "";
+
+    return `
+      <div class="step-card ${done ? "done" : ""}">
+        <div class="step-header" onclick="toggleStep('${id}', '${name.replace(/'/g, "\\'")}', ${points}, ${substeps.length})">
+          <div class="check">${done ? "✓" : ""}</div>
+          <div class="step-body">
+            <div class="step-top">
+              <h3>${name}</h3>
+              <div class="step-actions">
+                ${videoBtnHtml}
+                <span class="badge">+${points} pts</span>
+              </div>
+            </div>
+            <p class="meta">${guide}</p>
+            <div class="spec">${spec}</div>
+          </div>
+        </div>
+        ${videoEmbedHtml}
+        <div class="substeps">${subHtml}</div>
+      </div>`;
+  }).join("");
+
+  document.getElementById("view").innerHTML = `
+    <h1>${title}</h1>
+    <p class="sub">${sub}</p>
+    <div class="checklist">${listHtml}</div>`;
+}
+
+window.toggleVideo = (id) => {
+  openVideos[id] = !openVideos[id];
+  render();
+};
+
+window.toggleStep = (id, name, points, subCount) => {
+  if (state.steps[id]) {
+    delete state.steps[id];
+    for (let s = 0; s < subCount; s++) delete state.substeps[`${id}_${s}`];
+  } else {
+    state.steps[id] = { name, points };
+    for (let s = 0; s < subCount; s++) state.substeps[`${id}_${s}`] = true;
+  }
+  save(); render();
+};
+
+window.toggleSub = (stepId, subId, name, points, subCount) => {
+  state.substeps[subId] ? delete state.substeps[subId] : (state.substeps[subId] = true);
+
+  let allChecked = true;
+  for (let s = 0; s < subCount; s++) {
+    if (!state.substeps[`${stepId}_${s}`]) { allChecked = false; break; }
+  }
+  if (allChecked) state.steps[stepId] = { name, points };
+  else delete state.steps[stepId];
+
+  save(); render();
+};
+
+window.resetWizard = () => {
+  state = { stage: 0, steps: {}, substeps: {}, doneStages: {}, ecoPoints: 0, carbonCoins: 0, level: 1, badges: [] };
+  openVideos = {};
+  save(); render();
+};
+
+document.getElementById("prev").onclick = () => {
+  if (state.stage > 0) { state.stage--; save(); render(); window.scrollTo(0, 0); }
+};
+
+document.getElementById("next").onclick = () => {
+  if (state.stage >= STAGES.length) {
+    location.href = "io.html";
+    return;
+  }
+  state.doneStages[state.stage] = true;
+  state.stage++;
+  save(); render(); window.scrollTo(0, 0);
+};
+
+save(); render();
+</script>
+</body>
+</html>

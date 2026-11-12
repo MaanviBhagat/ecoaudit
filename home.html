@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EcoAudit: Home</title>
+<style>
+  :root {
+    --bg: #f4f9f5;
+    --surface: #ffffff;
+    --ink: #14281c;
+    --muted: #5c7164;
+    --border: #cfe0d4;
+    --green: #2e7d4f;
+    --green-dark: #1f5c3a;
+    --chip: #e3efe7;
+    --focus: #8fd0a8;
+    --card-a: #ffffff;
+    --card-b: #e2f0e6;
+    --card-c: #c9dfd0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1c15;
+      --surface: #16271d;
+      --ink: #e6f2ea;
+      --muted: #9bb3a4;
+      --border: #2a4234;
+      --green: #4caf7a;
+      --green-dark: #6cc796;
+      --chip: #1e3427;
+      --focus: #2f6a47;
+      --card-a: #24402f;
+      --card-b: #1a2f23;
+      --card-c: #14261c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  /* Header */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .brand { font-weight: 600; font-size: 18px; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .brand::before { content: ""; width: 14px; height: 14px; background: var(--green); border-radius: 0 100% 0 100%; }
+  .actions { display: flex; gap: 8px; align-items: center; }
+  .menu, .loc { position: relative; }
+  .btn {
+    font: inherit; font-size: 14px; border: 0; border-radius: 8px;
+    padding: 8px 14px; cursor: pointer; transition: background .15s;
+  }
+  .btn.soft { background: var(--chip); color: var(--ink); }
+  .btn.soft:hover { background: var(--border); }
+  .btn.solid { background: var(--green); color: #fff; }
+  .btn.solid:hover { background: var(--green-dark); }
+  .pop {
+    position: absolute; right: 0; top: calc(100% + 8px); z-index: 5;
+    min-width: 200px; padding: 8px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(20, 40, 28, .12);
+  }
+  .pop[hidden] { display: none; }
+  .pop a { display: block; padding: 8px 10px; border-radius: 6px; text-decoration: none; }
+  .pop a:hover { background: var(--chip); }
+  .pop label { display: block; font-size: 13px; color: var(--muted); margin: 2px 2px 6px; }
+  .pop input {
+    width: 100%; padding: 8px 10px; font: inherit; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px;
+  }
+  .pop .btn { width: 100%; }
+
+  /* Main */
+  main { flex: 1; width: 100%; max-width: 1080px; margin: 0 auto; padding: 48px 28px 64px; }
+  .intro { padding: 0 18px; margin-bottom: 36px; }
+  h1 { font-size: 32px; font-weight: 650; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .intro p { margin: 0; color: var(--muted); }
+
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .card {
+    display: block; text-decoration: none;
+    padding: 20px 18px 22px; min-height: 128px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: radial-gradient(circle at 35% 15%, var(--card-a) 0%, var(--card-b) 45%, var(--card-c) 100%);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(31, 92, 58, .14); }
+  .card .icon { font-size: 14px; line-height: 1; display: block; height: 16px; margin-bottom: 10px; }
+  .card h2 { font-size: 30px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.15; margin: 0 0 14px; }
+  .card span.sub { color: var(--muted); font-size: 14px; }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--border); padding: 32px 32px 40px; }
+  .foot { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 200px 1fr; gap: 24px; }
+  .logo { width: 32px; height: 32px; color: var(--green); margin-bottom: 18px; }
+  .social { display: flex; gap: 14px; list-style: none; margin: 0; padding: 0; }
+  .social a { display: block; width: 22px; height: 22px; color: var(--ink); }
+  .social a:hover { color: var(--green); }
+  .social svg { width: 100%; height: 100%; display: block; }
+  footer h3 { font-size: 14px; font-weight: 600; margin: 0 0 4px; }
+  footer p { margin: 0; max-width: 72ch; font-size: 14px; }
+
+  /* Soft leaf decoration: purely visual, sits behind content */
+  body::before, body::after {
+    content: "";
+    position: fixed;
+    width: 340px; height: 340px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 210'><path d='M10 190C60 150 100 100 172 36' stroke='%232e7d4f' stroke-width='2.5' fill='none' stroke-linecap='round'/><g transform='translate(10 190) rotate(-60) scale(0.9)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(48 160) rotate(-5) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(52 158) rotate(-88) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(88 120) rotate(-2) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(92 116) rotate(-92) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(128 78) rotate(0) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(132 74) rotate(-90) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(170 38) rotate(-50) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g></svg>") no-repeat center / contain;
+    opacity: .12;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::before { left: -30px; bottom: -30px; }
+  body::after { right: -30px; top: 60px; transform: rotate(180deg) scaleX(-1); }
+  @media (prefers-color-scheme: dark) {
+    body::before, body::after { opacity: .09; }
+  }
+  header, main { position: relative; z-index: 1; }
+  @media (max-width: 600px) {
+    body::before, body::after { width: 200px; height: 200px; }
+  }
+  @media (max-width: 720px) {
+    header { padding: 12px 18px; }
+    main { padding: 32px 18px 48px; }
+    .intro { padding: 0 4px; }
+    h1 { font-size: 27px; }
+    .cards { grid-template-columns: 1fr; gap: 16px; }
+    .card h2 { font-size: 26px; }
+    footer { padding: 28px 18px 36px; }
+    .foot { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="brand" href="index.html">EcoAudit</a>
+  <div class="actions">
+    <div class="menu">
+      <button class="btn soft" id="menuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="menuPop" aria-label="More options">&middot;&middot;&middot;</button>
+      <div class="pop" id="menuPop" hidden>
+        <a href="login.html">Login</a>
+        <a href="register.html">Create an account</a>
+      </div>
+    </div>
+    <div class="loc">
+      <button class="btn solid" id="locBtn" aria-haspopup="true" aria-expanded="false" aria-controls="locPop">Location</button>
+      <div class="pop" id="locPop" hidden>
+        <label for="locInput">Your city</label>
+        <input id="locInput" type="text" placeholder="e.g. Pune" autocomplete="address-level2" maxlength="60">
+        <button class="btn solid" id="locSave" type="button">Save location</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="intro">
+    <h1>Hey there!</h1>
+    <p>Let&rsquo;s make our country green.</p>
+  </section>
+
+  <section class="cards" aria-label="Main tools">
+    <!-- TODO: point these at your real pages -->
+    <!-- Keep the exact class name used on the Data Advisory card -->
+  <a href="io.html" class="card">
+  <span>✨</span>
+  <h2>Insight Portal</h2>
+  <p>Guidance</p>
+  </a>
+    <a class="card" href="#data-advisory">
+      <span class="icon" aria-hidden="true">&#129488;</span>
+      <h2>Data Advisory</h2>
+      <span class="sub">Store and Analyze</span>
+    </a>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <div>
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true" fill="currentColor">
+        <path d="M4 28C4 14 13 5 28 4C28 19 19 28 4 28Z"/>
+        <path d="M5 27C11 19 17 14 24 9" stroke="#fff" stroke-opacity=".6" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      </svg>
+      <ul class="social">
+        <li><a href="#" aria-label="EcoAudit on X"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4L4 20"/></svg></a></li>
+        <li><a href="#" aria-label="EcoAudit on Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg></a></li>
+        <li><a href="#" aria-label="EcoAudit on YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8ZM10 15V9l5.2 3L10 15Z"/></svg></a></li>
+        <li><a href="#" aria-label="EcoAudit on LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm1.6 7.5V18h2.4v-7.5H6.6ZM7.8 6.5a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8ZM11 10.5V18h2.4v-4c0-1.1.5-1.9 1.5-1.9s1.3.8 1.3 1.9V18h2.4v-4.5c0-2-1-3.2-2.7-3.2-1 0-1.8.5-2.2 1.2v-1H11Z"/></svg></a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>About us</h3>
+      <p>EcoAudit is a web/mobile platform offering a guided, modular sustainability setup for individuals and households. While climate anxiety is rising among citizens, most individuals struggle with how to start making sustainable changes in their own homes and routines. Whether constructing a new home or trying to live more sustainably in an existing one, people lack access to customized, actionable guidance for eco-friendly upgrades or daily swaps.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  function popover(btn, pop, onOpen) {
+    function close() { pop.hidden = true; btn.setAttribute("aria-expanded", "false"); }
+    function open() {
+      document.dispatchEvent(new CustomEvent("closepops"));
+      pop.hidden = false; btn.setAttribute("aria-expanded", "true");
+      if (onOpen) onOpen();
+    }
+    btn.addEventListener("click", function (e) { e.stopPropagation(); pop.hidden ? open() : close(); });
+    pop.addEventListener("click", function (e) { e.stopPropagation(); });
+    document.addEventListener("click", close);
+    document.addEventListener("closepops", close);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !pop.hidden) { close(); btn.focus(); }
+    });
+    return close;
+  }
+
+  popover(document.getElementById("menuBtn"), document.getElementById("menuPop"));
+
+  var locBtn = document.getElementById("locBtn");
+  var locInput = document.getElementById("locInput");
+  var closeLoc = popover(locBtn, document.getElementById("locPop"), function () { locInput.focus(); });
+
+  function setLabel(city) { locBtn.textContent = city || "Location"; }
+  try {
+    var saved = localStorage.getItem("ecoAuditCity");
+    if (saved) { locInput.value = saved; setLabel(saved); }
+  } catch (err) { /* storage unavailable: carry on */ }
+
+  function saveLocation() {
+    var city = locInput.value.trim();
+    setLabel(city);
+    try {
+      if (city) localStorage.setItem("ecoAuditCity", city);
+      else localStorage.removeItem("ecoAuditCity");
+    } catch (err) { /* ignore */ }
+    closeLoc();
+    locBtn.focus();
+  }
+  document.getElementById("locSave").addEventListener("click", saveLocation);
+  locInput.addEventListener("keydown", function (e) { if (e.key === "Enter") saveLocation(); });
+})();
+</script>
+</body>
+</html>

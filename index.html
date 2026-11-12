@@ -1,208 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sustainable Solutions</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Nunito', sans-serif;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registration</title>
+<style>
+  :root {
+    --bg: #f4f9f5;
+    --surface: #ffffff;
+    --ink: #14281c;
+    --muted: #5c7164;
+    --border: #cfe0d4;
+    --green: #2e7d4f;
+    --green-dark: #1f5c3a;
+    --focus: #8fd0a8;
+    --error: #b3402f;
+    --error-bg: #fbeeeb;
+    --ok-bg: #e6f4ea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1c15;
+      --surface: #16271d;
+      --ink: #e6f2ea;
+      --muted: #9bb3a4;
+      --border: #2a4234;
+      --green: #4caf7a;
+      --green-dark: #6cc796;
+      --focus: #2f6a47;
+      --error: #f0907f;
+      --error-bg: #2d1a16;
+      --ok-bg: #173324;
     }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    font-weight: 600;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  header::before {
+    content: "";
+    width: 14px; height: 14px;
+    background: var(--green);
+    border-radius: 0 100% 0 100%;
+  }
+  main {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 64px 20px 48px;
+    text-align: center;
+  }
+  h1 { font-size: 30px; margin: 0 0 40px; font-weight: 650; letter-spacing: -0.01em; }
+  form, .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: left;
+  }
+  .field { margin-bottom: 18px; }
+  label { display: block; margin-bottom: 6px; font-size: 14px; }
+  input[type="email"], input[type="password"], input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    font: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  input::placeholder { color: var(--muted); opacity: .7; }
+  input:focus-visible, button:focus-visible, a:focus-visible, .check input:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 1px;
+    border-color: var(--green);
+  }
+  input[aria-invalid="true"] { border-color: var(--error); }
+  .pw { position: relative; }
+  .pw input { padding-right: 64px; }
+  .toggle {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    background: none; border: 0; color: var(--green-dark);
+    font: inherit; font-size: 13px; padding: 6px 8px; cursor: pointer; border-radius: 6px;
+  }
+  .error { color: var(--error); font-size: 13px; margin: 6px 0 0; min-height: 0; }
+  .error:empty { display: none; }
+  .hint { color: var(--muted); font-size: 13px; margin: 6px 0 0; }
+  .check { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .check input { width: 16px; height: 16px; accent-color: var(--green); margin: 0; }
+  .check label { margin: 0; }
+  button.primary {
+    width: 100%;
+    padding: 11px;
+    font: inherit;
+    color: #fff;
+    background: var(--green);
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  button.primary:hover { background: var(--green-dark); }
+  .status {
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+  }
+  .status.show { display: block; background: var(--ok-bg); color: var(--green-dark); }
+  .status.err { display: block; background: var(--error-bg); color: var(--error); }
+  .alt { margin-top: 28px; text-align: center; color: var(--ink); }
+  .alt a { color: var(--ink); font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--green); }
+  .alt a:hover { color: var(--green-dark); }
 
-    body {
-      background-color: #f0fff0;
-      color: #2e7d32;
-    }
-
-    header {
-      background-color: #a5d6a7;
-      padding: 1.5rem;
-    }
-
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .logo {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #1b5e20;
-    }
-
-    .nav-links {
-      list-style: none;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .nav-links li a {
-      text-decoration: none;
-      color: #1b5e20;
-      font-weight: 600;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      transition: background 0.3s;
-    }
-
-    .nav-links li a:hover {
-      background-color: #81c784;
-    }
-
-    .hero {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 3rem 1rem;
-      background: linear-gradient(to right, #e8f5e9, #c8e6c9);
-    }
-
-    .hero h2 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .hero p {
-      font-size: 1.1rem;
-      margin-bottom: 1.5rem;
-      max-width: 600px;
-    }
-
-    .cta-button {
-      background-color: #388e3c;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      text-decoration: none;
-      border-radius: 30px;
-      font-weight: bold;
-      transition: background-color 0.3s;
-    }
-
-    .cta-button:hover {
-      background-color: #2e7d32;
-    }
-
-    .info-section {
-      padding: 2rem;
-      text-align: center;
-    }
-
-    .info-section h3 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .info-section p {
-      font-size: 1rem;
-      max-width: 700px;
-      margin: auto;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-      padding: 2rem;
-    }
-
-    .feature-box {
-      background-color: #c8e6c9;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
-    }
-
-    .feature-box:hover {
-      transform: scale(1.02);
-    }
-
-    .feature-box h4 {
-      margin-bottom: 0.5rem;
-      color: #1b5e20;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #a5d6a7;
-      color: #1b5e20;
-    }
-
-    @media (max-width: 600px) {
-      .hero h2 {
-        font-size: 1.8rem;
-      }
-
-      .nav-links {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-  </style>
+  /* Soft leaf decoration: purely visual, sits behind content */
+  body::before, body::after {
+    content: "";
+    position: fixed;
+    width: 340px; height: 340px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 210'><path d='M10 190C60 150 100 100 172 36' stroke='%232e7d4f' stroke-width='2.5' fill='none' stroke-linecap='round'/><g transform='translate(10 190) rotate(-60) scale(0.9)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(48 160) rotate(-5) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(52 158) rotate(-88) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(88 120) rotate(-2) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(92 116) rotate(-92) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(128 78) rotate(0) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(132 74) rotate(-90) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(170 38) rotate(-50) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g></svg>") no-repeat center / contain;
+    opacity: .12;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::before { left: -30px; bottom: -30px; }
+  body::after { right: -30px; top: 60px; transform: rotate(180deg) scaleX(-1); }
+  @media (prefers-color-scheme: dark) {
+    body::before, body::after { opacity: .09; }
+  }
+  header, main { position: relative; z-index: 1; }
+  @media (max-width: 600px) {
+    body::before, body::after { width: 200px; height: 200px; }
+  }
+  @media (max-width: 480px) {
+    header { padding: 14px 20px; }
+    main { padding-top: 40px; }
+    h1 { font-size: 26px; margin-bottom: 28px; }
+  }
+</style>
 </head>
 <body>
-
-  <header>
-    <nav class="navbar">
-      <div class="logo">🌱 Sustainable Solutions</div>
-      <ul class="nav-links">
-        <li><a href="#">Home</a></li>
-        <li><a href="#setup">Setup Wizard</a></li>
-        <li><a href="#tools">Tools</a></li>
-        <li><a href="#forum">Community</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
-    <section class="hero">
-      <h2>Live Greener. Live Smarter.</h2>
-      <p>Your guide to building an eco-conscious home and lifestyle aligned with UN Sustainable Development Goals.</p>
-      <a href="#setup" class="cta-button">Get Started</a>
-    </section>
-  </header>
-
+  <header>Registration</header>
   <main>
-    <section class="info-section">
-      <h3>Why Choose Sustainable Solutions?</h3>
-      <p>We help you make informed lifestyle choices—from setting up your homestead to tracking your zero-waste goals—while keeping sustainability at the heart of everything.</p>
-    </section>
+    <h1>New User</h1>
 
-    <section class="features-grid" id="tools">
-      <div class="feature-box"><h4>🏠 Home Setup Wizard</h4></div>
-      <div class="feature-box"><h4>📚 Learning Center</h4></div>
-      <div class="feature-box"><h4>📊 Green Score Dashboard</h4></div>
-      <div class="feature-box"><h4>🌿 Eco Directory</h4></div>
-      <div class="feature-box"><h4>💬 Community Forum</h4></div>
-      <div class="feature-box"><h4>♻️ Waste & Water Tools</h4></div>
-      <div class="feature-box"><h4>📈 EcoAudit – MSME Dashboard</h4></div>
-      <div class="feature-box"><h4>🌾 How to Set Up a Homestead</h4></div>
-      <div class="feature-box"><h4>⚗️ Safe Wastewater & Chemical Disposal</h4></div>
-      <div class="feature-box"><h4>🚰 Smart Water Usage Tips</h4></div>
-      <div class="feature-box"><h4>🌧️ Rainwater Harvesting</h4></div>
-      <div class="feature-box"><h4>🔌 Energy Starter Wizard</h4></div>
-      <div class="feature-box"><h4>🌞 Renewable Energy Integration Guide</h4></div>
-      <div class="feature-box"><h4>🏡 Smart Home Energy Planner</h4></div>
-      <div class="feature-box"><h4>🤖 Eco-Tech Explorer</h4></div>
-      <div class="feature-box"><h4>🚲 Green Commute Planner</h4></div>
-      <div class="feature-box"><h4>🏙️ Urban Eco-Living Tips</h4></div>
-      <div class="feature-box"><h4>🧺 Zero Waste Tracker</h4></div>
-      <div class="feature-box"><h4>📣 Citizen Reporting & Awareness App</h4></div>
-      <div class="feature-box"><h4>🔍 Green Product Scanner</h4></div>
-      <div class="feature-box"><h4>🥗 Nutrition Label Scanner</h4></div>
-      <div class="feature-box"><h4>💧 Water Guidance Module</h4></div>
-    </section>
+    <form id="form" novalidate>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" aria-describedby="email-error">
+        <p id="email-error" class="error" role="alert"></p>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="pw">
+          <input id="password" name="password" type="password" placeholder="At least 8 characters" autocomplete="new-password" aria-describedby="password-hint password-error">
+          <button type="button" class="toggle" id="toggle" aria-controls="password" aria-label="Show password">Show</button>
+        </div>
+        <p id="password-hint" class="hint">Use 8 or more characters with a letter and a number.</p>
+        <p id="password-error" class="error" role="alert"></p>
+      </div>
+
+      <div class="check">
+        <input id="remember" type="checkbox" checked>
+        <label for="remember">Remember me?</label>
+      </div>
+
+      <button type="submit" class="primary">Register</button>
+    </form>
+
+    <p class="alt">Already have an account? <a href="login.html">Login</a></p>
   </main>
 
-  <footer>
-    <p>© 2025 Sustainable Solutions. Built with 💚 for a greener tomorrow.</p>
-  </footer>
+<script>
+(function () {
+  var form = document.getElementById("form");
+  var email = document.getElementById("email");
+  var password = document.getElementById("password");
+  var remember = document.getElementById("remember");
+  var status = document.getElementById("status");
+  var toggle = document.getElementById("toggle");
 
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  function checkEmail(v) {
+    v = v.trim();
+    if (!v) return "Enter your email address.";
+    if (!EMAIL_RE.test(v)) return "Enter a valid email, like name@example.com.";
+    return "";
+  }
+  function checkPassword(v) {
+    if (!v) return "Enter a password.";
+    if (v.length < 8) return "Password must be at least 8 characters.";
+    if (!/[A-Za-z]/.test(v) || !/\d/.test(v)) return "Password needs at least one letter and one number.";
+    return "";
+  }
+
+  function show(input, msg) {
+    var out = document.getElementById(input.id + "-error");
+    out.textContent = msg;
+    if (msg) input.setAttribute("aria-invalid", "true");
+    else input.removeAttribute("aria-invalid");
+    return !msg;
+  }
+
+  email.addEventListener("blur", function () { if (email.value) show(email, checkEmail(email.value)); });
+  password.addEventListener("blur", function () { if (password.value) show(password, checkPassword(password.value)); });
+  email.addEventListener("input", function () { if (email.hasAttribute("aria-invalid")) show(email, checkEmail(email.value)); });
+  password.addEventListener("input", function () { if (password.hasAttribute("aria-invalid")) show(password, checkPassword(password.value)); });
+
+  toggle.addEventListener("click", function () {
+    var hidden = password.type === "password";
+    password.type = hidden ? "text" : "password";
+    toggle.textContent = hidden ? "Hide" : "Show";
+    toggle.setAttribute("aria-label", hidden ? "Hide password" : "Show password");
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    status.className = "status";
+    status.textContent = "";
+
+    var okEmail = show(email, checkEmail(email.value));
+    var okPass = show(password, checkPassword(password.value));
+    if (!okEmail) { email.focus(); return; }
+    if (!okPass) { password.focus(); return; }
+
+    var cleanEmail = email.value.trim().toLowerCase();
+    var rawPassword = password.value;
+
+    try {
+      var users = JSON.parse(localStorage.getItem("greenAuthUsers") || "[]");
+      var exists = users.some(function (u) { return u.email === cleanEmail; });
+
+      if (exists) {
+        status.textContent = "An account with this email already exists. Please log in.";
+        status.className = "status err";
+        return;
+      }
+
+      users.push({ email: cleanEmail, password: rawPassword });
+      localStorage.setItem("greenAuthUsers", JSON.stringify(users));
+
+      if (remember.checked) localStorage.setItem("greenAuthEmail", email.value.trim());
+      else localStorage.removeItem("greenAuthEmail");
+    } catch (err) {
+      status.textContent = "Could not save account to browser storage.";
+      status.className = "status err";
+      return;
+    }
+
+    status.textContent = "Account created for " + email.value.trim() + ". You can now log in.";
+    status.className = "status show";
+    password.value = "";
+  });
+})();
+</script>
 </body>
 </html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insight Portal</title>
+<style>
+  :root {
+    --bg: #f4f9f5;
+    --surface: #ffffff;
+    --card-grad: linear-gradient(145deg, #ffffff 0%, #ebf5ee 100%);
+    --ink: #14281c;
+    --muted: #5c7164;
+    --border: #cfe0d4;
+    --green: #2e7d4f;
+    --green-dark: #1f5c3a;
+    --green-soft: #e6f4ea;
+    --focus: #8fd0a8;
+    --shadow: 0 4px 16px rgba(20, 40, 28, 0.04);
+    --shadow-hover: 0 10px 24px rgba(46, 125, 79, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1c15;
+      --surface: #16271d;
+      --card-grad: linear-gradient(145deg, #16271d 0%, #1c3326 100%);
+      --ink: #e6f2ea;
+      --muted: #9bb3a4;
+      --border: #2a4234;
+      --green: #4caf7a;
+      --green-dark: #6cc796;
+      --green-soft: #1d3829;
+      --focus: #2f6a47;
+      --shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+      --shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* Header matching login & registration */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .brand {
+    font-weight: 600;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    background: var(--green);
+    border-radius: 0 100% 0 100%;
+    flex-shrink: 0;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .user-pill {
+    font-size: 13px;
+    color: var(--muted);
+    display: none;
+  }
+  .btn-outline {
+    padding: 8px 16px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color .15s, background .15s, color .15s;
+  }
+  .btn-outline:hover {
+    border-color: var(--green);
+    background: var(--green-soft);
+    color: var(--green-dark);
+  }
+  .btn-outline:focus-visible,
+  .portal-card:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+    border-color: var(--green);
+  }
+
+  /* Main layout */
+  main {
+    max-width: 1020px;
+    margin: 0 auto;
+    padding: 56px 24px 64px;
+  }
+  .page-head {
+    margin-bottom: 36px;
+  }
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--green);
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+  }
+  h1 {
+    font-size: 32px;
+    margin: 0;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+  }
+
+  /* 2x2 Portal Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .portal-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    background: var(--card-grad);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .portal-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--green);
+  }
+  .card-top {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .icon-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--green-soft);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  .arrow {
+    color: var(--muted);
+    font-size: 18px;
+    transition: transform .18s ease, color .18s ease;
+  }
+  .portal-card:hover .arrow {
+    color: var(--green);
+    transform: translateX(4px);
+  }
+  .portal-card h2 {
+    font-size: 22px;
+    font-weight: 650;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .portal-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14.5px;
+  }
+
+  /* Soft leaf decoration matching login & registration */
+  body::before, body::after {
+    content: "";
+    position: fixed;
+    width: 340px;
+    height: 340px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 210'><path d='M10 190C60 150 100 100 172 36' stroke='%232e7d4f' stroke-width='2.5' fill='none' stroke-linecap='round'/><g transform='translate(10 190) rotate(-60) scale(0.9)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(48 160) rotate(-5) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(52 158) rotate(-88) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(88 120) rotate(-2) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(92 116) rotate(-92) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(128 78) rotate(0) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(132 74) rotate(-90) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(170 38) rotate(-50) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g></svg>") no-repeat center / contain;
+    opacity: .12;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::before { left: -30px; bottom: -30px; }
+  body::after { right: -30px; top: 60px; transform: rotate(180deg) scaleX(-1); }
+  @media (prefers-color-scheme: dark) {
+    body::before, body::after { opacity: .09; }
+  }
+  header, main { position: relative; z-index: 1; }
+
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: 1fr; }
+    main { padding-top: 36px; }
+    h1 { font-size: 26px; }
+  }
+  @media (max-width: 600px) {
+    body::before, body::after { width: 200px; height: 200px; }
+  }
+  @media (max-width: 480px) {
+    header { padding: 14px 20px; }
+    .user-pill { display: none !important; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">Insight Portal</div>
+    <div class="header-actions">
+      <span id="user-pill" class="user-pill"></span>
+      <button type="button" id="back-btn" class="btn-outline">Back</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-head">
+      <span class="eyebrow">Sustainability Guide</span>
+      <h1>What do you want to make sustainable?</h1>
+    </div>
+
+    <div class="grid">
+      <a href="home-setup.html" class="portal-card">
+        <div class="card-top">
+          <div class="icon-badge" aria-hidden="true">🏠</div>
+          <span class="arrow" aria-hidden="true">→</span>
+        </div>
+        <h2>Home Setup</h2>
+        <p>Sustainable and eco-friendly products for your home</p>
+      </a>
+
+      <a href="daily-swaps.html" class="portal-card">
+        <div class="card-top">
+          <div class="icon-badge" aria-hidden="true">🔄</div>
+          <span class="arrow" aria-hidden="true">→</span>
+        </div>
+        <h2>Daily Swaps</h2>
+        <p>Swap to live an eco-conscious lifestyle</p>
+      </a>
+
+      <a href="energy-setup.html" class="portal-card">
+        <div class="card-top">
+          <div class="icon-badge" aria-hidden="true">⚡</div>
+          <span class="arrow" aria-hidden="true">→</span>
+        </div>
+        <h2>Energy Setup</h2>
+        <p>Swaps for setting up solar panels</p>
+      </a>
+
+      <a href="water-setup.html" class="portal-card">
+        <div class="card-top">
+          <div class="icon-badge" aria-hidden="true">💧</div>
+          <span class="arrow" aria-hidden="true">→</span>
+        </div>
+        <h2>Water Setup</h2>
+        <p>Water management options</p>
+      </a>
+    </div>
+  </main>
+
+<script>
+(function () {
+  var userPill = document.getElementById("user-pill");
+  var backBtn = document.getElementById("back-btn");
+
+  // Display logged-in user email if available
+  try {
+    var rawUser = localStorage.getItem("greenAuthCurrentUser");
+    if (rawUser) {
+      var user = JSON.parse(rawUser);
+      if (user && user.email) {
+        userPill.textContent = user.email;
+        userPill.style.display = "inline";
+      }
+    }
+  } catch (err) { /* ignore */ }
+
+  // Back button: clears session and returns to login.html
+  backBtn.addEventListener("click", function () {
+    try {
+      localStorage.removeItem("greenAuthCurrentUser");
+    } catch (err) { /* ignore */ }
+    window.location.href = "login.html";
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login</title>
+<style>
+  :root {
+    --bg: #f4f9f5;
+    --surface: #ffffff;
+    --ink: #14281c;
+    --muted: #5c7164;
+    --border: #cfe0d4;
+    --green: #2e7d4f;
+    --green-dark: #1f5c3a;
+    --focus: #8fd0a8;
+    --error: #b3402f;
+    --error-bg: #fbeeeb;
+    --ok-bg: #e6f4ea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1c15;
+      --surface: #16271d;
+      --ink: #e6f2ea;
+      --muted: #9bb3a4;
+      --border: #2a4234;
+      --green: #4caf7a;
+      --green-dark: #6cc796;
+      --focus: #2f6a47;
+      --error: #f0907f;
+      --error-bg: #2d1a16;
+      --ok-bg: #173324;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    font-weight: 600;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  header::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    background: var(--green);
+    border-radius: 0 100% 0 100%;
+  }
+  main {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 64px 20px 48px;
+    text-align: center;
+  }
+  h1 {
+    font-size: 30px;
+    margin: 0 0 40px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+  form, .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: left;
+  }
+  .field { margin-bottom: 18px; }
+  label { display: block; margin-bottom: 6px; font-size: 14px; }
+  input[type="email"], input[type="password"], input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    font: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  input::placeholder { color: var(--muted); opacity: .7; }
+  input:focus-visible, button:focus-visible, a:focus-visible, .check input:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 1px;
+    border-color: var(--green);
+  }
+  input[aria-invalid="true"] { border-color: var(--error); }
+  .pw { position: relative; }
+  .pw input { padding-right: 64px; }
+  .toggle {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: 0;
+    color: var(--green-dark);
+    font: inherit;
+    font-size: 13px;
+    padding: 6px 8px;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .error {
+    color: var(--error);
+    font-size: 13px;
+    margin: 6px 0 0;
+    min-height: 0;
+  }
+  .error:empty { display: none; }
+  .hint { color: var(--muted); font-size: 13px; margin: 6px 0 0; }
+  .check { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .check input { width: 16px; height: 16px; accent-color: var(--green); margin: 0; }
+  .check label { margin: 0; }
+  button.primary {
+    width: 100%;
+    padding: 11px;
+    font: inherit;
+    color: #fff;
+    background: var(--green);
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  button.primary:hover { background: var(--green-dark); }
+  .status {
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+  }
+  .status.show {
+    display: block;
+    background: var(--ok-bg);
+    color: var(--green-dark);
+  }
+  .status.err {
+    display: block;
+    background: var(--error-bg);
+    color: var(--error);
+  }
+  .alt { margin-top: 28px; text-align: center; color: var(--ink); }
+  .alt a {
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 2px solid var(--green);
+  }
+  .alt a:hover { color: var(--green-dark); }
+  /* Soft leaf decoration: purely visual, sits behind content */
+  body::before, body::after {
+    content: "";
+    position: fixed;
+    width: 340px;
+    height: 340px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 210'><path d='M10 190C60 150 100 100 172 36' stroke='%232e7d4f' stroke-width='2.5' fill='none' stroke-linecap='round'/><g transform='translate(10 190) rotate(-60) scale(0.9)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(48 160) rotate(-5) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(52 158) rotate(-88) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(88 120) rotate(-2) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(92 116) rotate(-92) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(128 78) rotate(0) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(132 74) rotate(-90) scale(1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g><g transform='translate(170 38) rotate(-50) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/><path d='M2 0H36' stroke='%23ffffff' stroke-opacity='.55' stroke-width='1.2' fill='none'/></g></svg>") no-repeat center / contain;
+    opacity: .12;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::before { left: -30px; bottom: -30px; }
+  body::after { right: -30px; top: 60px; transform: rotate(180deg) scaleX(-1); }
+  @media (prefers-color-scheme: dark) {
+    body::before, body::after { opacity: .09; }
+  }
+  header, main { position: relative; z-index: 1; }
+  @media (max-width: 600px) {
+    body::before, body::after { width: 200px; height: 200px; }
+  }
+  @media (max-width: 480px) {
+    header { padding: 14px 20px; }
+    main { padding-top: 40px; }
+    h1 { font-size: 26px; margin-bottom: 28px; }
+  }
+</style>
+</head>
+<body>
+<header>Login</header>
+<main>
+  <h1>Welcome back</h1>
+  <form id="form" novalidate>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" aria-describedby="email-error">
+      <p id="email-error" class="error" role="alert"></p>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <div class="pw">
+        <input id="password" name="password" type="password" placeholder="Your password" autocomplete="current-password" aria-describedby="password-error">
+        <button type="button" class="toggle" id="toggle" aria-controls="password" aria-label="Show password">Show</button>
+      </div>
+      <p id="password-error" class="error" role="alert"></p>
+    </div>
+    <div class="check">
+      <input id="remember" type="checkbox" checked>
+      <label for="remember">Remember me?</label>
+    </div>
+    <button type="submit" class="primary">Login</button>
+  </form>
+  <p class="alt">New here? <a href="index.html">Create an account</a></p>
+</main>
+<script>
+(function () {
+  var form = document.getElementById("form");
+  var email = document.getElementById("email");
+  var password = document.getElementById("password");
+  var remember = document.getElementById("remember");
+  var status = document.getElementById("status");
+  var toggle = document.getElementById("toggle");
+
+  try {
+    var saved = localStorage.getItem("greenAuthEmail");
+    if (saved) email.value = saved;
+  } catch (err) { /* ignore */ }
+
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  function checkEmail(v) {
+    v = v.trim();
+    if (!v) return "Enter your email address.";
+    if (!EMAIL_RE.test(v)) return "Enter a valid email, like name@example.com.";
+    return "";
+  }
+
+  function checkPassword(v) {
+    if (!v) return "Enter a password.";
+    return "";
+  }
+
+  function show(input, msg) {
+    var out = document.getElementById(input.id + "-error");
+    out.textContent = msg;
+    if (msg) input.setAttribute("aria-invalid", "true");
+    else input.removeAttribute("aria-invalid");
+    return !msg;
+  }
+
+  email.addEventListener("blur", function () {
+    if (email.value) show(email, checkEmail(email.value));
+  });
+
+  password.addEventListener("blur", function () {
+    if (password.value) show(password, checkPassword(password.value));
+  });
+
+  email.addEventListener("input", function () {
+    if (email.hasAttribute("aria-invalid")) show(email, checkEmail(email.value));
+  });
+
+  password.addEventListener("input", function () {
+    if (password.hasAttribute("aria-invalid")) show(password, checkPassword(password.value));
+  });
+
+  toggle.addEventListener("click", function () {
+    var hidden = password.type === "password";
+    password.type = hidden ? "text" : "password";
+    toggle.textContent = hidden ? "Hide" : "Show";
+    toggle.setAttribute("aria-label", hidden ? "Hide password" : "Show password");
+  });
+
+  // Scans common localStorage keys (supports both arrays and single objects)
+  function findRegisteredUser(enteredEmail, enteredPass) {
+    var candidateKeys = ["greenAuthUsers", "greenAuthUser", "users", "user", "account", "registeredUser"];
+    
+    for (var i = 0; i < candidateKeys.length; i++) {
+      var raw = localStorage.getItem(candidateKeys[i]);
+      if (!raw) continue;
+
+      try {
+        var parsed = JSON.parse(raw);
+        var list = Array.isArray(parsed) ? parsed : [parsed];
+
+        var match = list.find(function (u) {
+          if (!u || typeof u !== "object") return false;
+          var storedEmail = (u.email || u.username || u.user || "").trim().toLowerCase();
+          var storedPass = u.password || u.pass || u.pwd || "";
+          return storedEmail === enteredEmail && storedPass === enteredPass;
+        });
+
+        if (match) return match;
+      } catch (e) { /* skip non-JSON values */ }
+    }
+    return null;
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    status.className = "status";
+    status.textContent = "";
+
+    var okEmail = show(email, checkEmail(email.value));
+    var okPass = show(password, checkPassword(password.value));
+    if (!okEmail) { email.focus(); return; }
+    if (!okPass) { password.focus(); return; }
+
+    var enteredEmail = email.value.trim().toLowerCase();
+    var enteredPass = password.value;
+    var matchedUser = findRegisteredUser(enteredEmail, enteredPass);
+
+    if (!matchedUser) {
+      status.textContent = "Invalid email or password. Please check your details or create an account.";
+      status.className = "status err";
+      password.value = "";
+      password.focus();
+      return;
+    }
+
+    try {
+      if (remember.checked) {
+        localStorage.setItem("greenAuthEmail", email.value.trim());
+      } else {
+        localStorage.removeItem("greenAuthEmail");
+      }
+      localStorage.setItem("greenAuthCurrentUser", JSON.stringify(matchedUser));
+    } catch (err) { /* ignore */ }
+
+    status.textContent = "Login successful! Redirecting...";
+    status.className = "status show";
+    password.value = "";
+
+    window.location.href = "home.html";
+  });
+})();
+</script>
+</body>
+</html>
