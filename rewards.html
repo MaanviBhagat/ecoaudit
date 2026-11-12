@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eco Missions & Rewards</title>
+<style>
+  :root {
+    --bg: #f4f9f5; --surface: #ffffff; --surface-soft: #eef6f0;
+    --ink: #14281c; --muted: #5c7164; --border: #cfe0d4;
+    --green: #2e7d4f; --green-dark: #1f5c3a; --soft: #e6f4ea;
+    --amber-bg: #fef7e0; --amber-ink: #8a5a00;
+    --shadow: 0 4px 16px rgba(20, 40, 28, 0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1c15; --surface: #16271d; --surface-soft: #1b3024;
+      --ink: #e6f2ea; --muted: #9bb3a4; --border: #2a4234;
+      --green: #4caf7a; --green-dark: #6cc796; --soft: #1d3829;
+      --amber-bg: #332810; --amber-ink: #f7cf74;
+      --shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-size: 15px; line-height: 1.5;
+  }
+
+  /* Header */
+  header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 14px 28px; display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 20;
+  }
+  .brand { font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+  .brand::before { content: ""; width: 14px; height: 14px; background: var(--green); border-radius: 0 100% 0 100%; }
+  .btn-outline {
+    padding: 7px 15px; border-radius: 8px; font: inherit; font-size: 13.5px; font-weight: 600;
+    border: 1px solid var(--border); background: var(--surface); color: var(--ink);
+    text-decoration: none; cursor: pointer;
+  }
+  .btn-outline:hover { border-color: var(--green); background: var(--soft); color: var(--green-dark); }
+
+  main { max-width: 920px; margin: 0 auto; padding: 32px 20px 64px; position: relative; z-index: 1; }
+
+  /* Top Profile & Currency Banner */
+  .hero-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px; box-shadow: var(--shadow); margin-bottom: 24px;
+  }
+  .hero-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+  .user-info { display: flex; align-items: center; gap: 14px; }
+  .avatar {
+    width: 48px; height: 48px; border-radius: 12px; background: var(--soft);
+    border: 1.5px solid var(--green); display: flex; align-items: center; justify-content: center; font-size: 24px;
+  }
+  .user-info h1 { margin: 0; font-size: 20px; font-weight: 650; }
+  .user-info p { margin: 2px 0 0; color: var(--muted); font-size: 13.5px; }
+  .rank-pill {
+    background: var(--soft); border: 1px solid var(--border); color: var(--green-dark);
+    padding: 6px 14px; border-radius: 99px; font-weight: 600; font-size: 13px;
+  }
+
+  .wallet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 18px; }
+  .wallet-box {
+    padding: 16px 18px; border-radius: 12px; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .wallet-box.points { background: var(--soft); }
+  .wallet-box.coins { background: var(--amber-bg); }
+  .wallet-val { font-size: 26px; font-weight: 700; line-height: 1.1; }
+  .wallet-box.points .wallet-val { color: var(--green-dark); }
+  .wallet-box.coins .wallet-val { color: var(--amber-ink); }
+  .wallet-lbl { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  .progress-head { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .bar { height: 8px; background: var(--surface-soft); border-radius: 99px; overflow: hidden; }
+  .bar div { height: 100%; background: var(--green); transition: width .3s ease; }
+
+  /* Tabs */
+  .tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 6px; margin-bottom: 22px;
+  }
+  .tab-btn {
+    padding: 9px 12px; border: 0; border-radius: 7px; background: transparent;
+    color: var(--muted); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: all .15s;
+  }
+  .tab-btn.active { background: var(--green); color: #ffffff; }
+
+  /* Mission Rows */
+  .mission-list { display: flex; flex-direction: column; gap: 12px; }
+  .mission-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px; display: flex; justify-content: space-between; align-items: center;
+    gap: 14px; box-shadow: var(--shadow);
+  }
+  .mission-card.done { background: var(--surface-soft); border-color: var(--green); }
+  .mission-left { display: flex; align-items: center; gap: 14px; }
+  .m-icon {
+    width: 42px; height: 42px; border-radius: 10px; background: var(--soft);
+    border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .mission-left h3 { margin: 0 0 2px; font-size: 15.5px; }
+  .mission-left p { margin: 0 0 4px; font-size: 13px; color: var(--muted); }
+  .pts-tag { font-size: 12.5px; font-weight: 600; color: var(--green-dark); }
+  .action-btn {
+    padding: 8px 16px; border-radius: 8px; font: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--green); background: var(--green); color: #fff;
+    flex-shrink: 0; transition: background .15s;
+  }
+  .action-btn:hover { background: var(--green-dark); }
+  .action-btn.completed { background: var(--soft); color: var(--green-dark); cursor: default; }
+
+  /* Badges & Shop Grid */
+  .section-title { font-size: 17px; font-weight: 650; margin: 0 0 14px; }
+  .badges-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 14px; margin-bottom: 28px;
+  }
+  .badge-card {
+    background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 18px; text-align: center; display: flex; flex-direction: column;
+    justify-content: space-between; gap: 10px; box-shadow: var(--shadow);
+  }
+  .badge-card.owned { border-color: var(--green); background: var(--surface-soft); }
+  .badge-card.locked { opacity: .65; }
+  .b-emoji { font-size: 32px; }
+  .badge-card h4 { margin: 4px 0; font-size: 15px; }
+  .badge-card p { margin: 0; font-size: 12.5px; color: var(--muted); }
+  .buy-btn {
+    width: 100%; padding: 8px; border-radius: 8px; font: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--green); background: var(--green); color: #fff;
+  }
+  .buy-btn:disabled { background: var(--surface); color: var(--muted); border-color: var(--border); cursor: not-allowed; }
+  .owned-pill {
+    display: inline-block; padding: 5px 10px; border-radius: 99px; font-size: 12px;
+    font-weight: 600; background: var(--soft); color: var(--green-dark);
+  }
+
+  /* Soft leaf decoration */
+  body::before, body::after {
+    content: ""; position: fixed; width: 340px; height: 340px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 210'><path d='M10 190C60 150 100 100 172 36' stroke='%232e7d4f' stroke-width='2.5' fill='none' stroke-linecap='round'/><g transform='translate(10 190) rotate(-60) scale(0.9)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/></g><g transform='translate(88 120) rotate(-2) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/></g><g transform='translate(170 38) rotate(-50) scale(1.1)'><path d='M0 0C10 -13 28 -13 40 0C28 13 10 13 0 0Z' fill='%232e7d4f'/></g></svg>") no-repeat center / contain;
+    opacity: .12; pointer-events: none; z-index: 0;
+  }
+  body::before { left: -30px; bottom: -30px; }
+  body::after { right: -30px; top: 60px; transform: rotate(180deg) scaleX(-1); }
+
+  @media (max-width: 640px) {
+    .wallet-grid, .tabs { grid-template-columns: 1fr; }
+    .mission-card { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">Eco Missions & Rewards</div>
+    <div style="display:flex; gap:10px;">
+      <a href="home-setup.html" class="btn-outline">Home Wizard</a>
+      <a href="io.html" class="btn-outline">Back</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Profile & Points Wallet -->
+    <section class="hero-card">
+      <div class="hero-top">
+        <div class="user-info">
+          <div class="avatar">🌿</div>
+          <div>
+            <h1 id="greeting">Hi, Eco Builder!</h1>
+            <p>Complete missions & home setup steps to earn points and unlock badges</p>
+          </div>
+        </div>
+        <div class="rank-pill" id="rankBadge">Level 1 • Eco Seedling</div>
+      </div>
+
+      <div class="wallet-grid">
+        <div class="wallet-box points">
+          <div>
+            <div class="wallet-val" id="availPoints">0</div>
+            <div class="wallet-lbl">Available Eco Points (Total Earned: <span id="earnedPoints">0</span>)</div>
+          </div>
+          <span style="font-size:28px;">🌱</span>
+        </div>
+        <div class="wallet-box coins">
+          <div>
+            <div class="wallet-val" id="carbonCoins">0</div>
+            <div class="wallet-lbl">Carbon Coins</div>
+          </div>
+          <span style="font-size:28px;">🪙</span>
+        </div>
+      </div>
+
+      <div class="progress-head">
+        <span>Mission & Level Progress</span>
+        <span id="nextLevelText">0 / 200 pts to Level 2</span>
+      </div>
+      <div class="bar"><div id="levelFill" style="width:0%"></div></div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab-btn active" data-tab="daily">Daily Missions</button>
+      <button type="button" class="tab-btn" data-tab="weekly">Weekly Goals</button>
+      <button type="button" class="tab-btn" data-tab="badges">Badges & Point Shop</button>
+    </div>
+
+    <div id="tabContent"></div>
+  </main>
+
+<script>
+const STORAGE_KEY = "greenAuthGamification_v2";
+
+const DAILY_MISSIONS = [
+  { id: "d_bottles", icon: "💧", title: "Carry a Reusable Bottle", desc: "Avoid buying single-use plastic water bottles today", pts: 30 },
+  { id: "d_lights", icon: "💡", title: "Zero Phantom Power Day", desc: "Switch off all plugs, routers, and chargers before sleeping", pts: 25 },
+  { id: "d_segregate", icon: "♻️", title: "Segregate Wet & Dry Waste", desc: "Sort all kitchen scraps and dry recyclables into separate bins", pts: 35 },
+  { id: "d_commute", icon: "🚲", title: "Green Commute / Walk", desc: "Walk, cycle, or use public transit for short local trips", pts: 40 }
+];
+
+const WEEKLY_MISSIONS = [
+  { id: "w_tree", icon: "🌳", title: "Plant a Tree or Kitchen Herb", desc: "Add native greenery or herbs to your balcony/garden", pts: 100 },
+  { id: "w_compost", icon: "🪴", title: "Harvest / Layer Home Compost", desc: "Turn your kitchen compost bin with dry brown leaves", pts: 80 },
+  { id: "w_audit", icon: "📊", title: "Weekly Home Energy Check", desc: "Review appliance standby usage and keep AC at 24°C+", pts: 90 },
+  { id: "w_club", icon: "🤝", title: "Share a Sustainable Swap", desc: "Help a friend or family member switch to an eco-friendly habit", pts: 120 }
+];
+
+const SHOP_BADGES = [
+  { id: "shop_water", icon: "💧", title: "Water Saver Badge", desc: "Profile badge for water conservation champions", cost: 100 },
+  { id: "shop_warrior", icon: "♻️", title: "Waste Warrior Badge", desc: "Zero-waste kitchen & segregation specialist", cost: 150 },
+  { id: "shop_solar", icon: "☀️", title: "Solar Pioneer Badge", desc: "Clean energy & low-carbon home advocate", cost: 250 },
+  { id: "shop_champion", icon: "🏆", title: "Eco Champion Title", desc: "Unlocks the prestigious Eco Champion profile title", cost: 400 }
+];
+
+// Load existing wizard + gamification state
+let raw = {};
+try { raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch (e) {}
+
+let state = {
+  stage: raw.stage || 0,
+  steps: raw.steps || {},
+  substeps: raw.substeps || {},
+  doneStages: raw.doneStages || {},
+  completedMissions: raw.completedMissions || {}, // { missionId: pts }
+  purchasedBadges: raw.purchasedBadges || {},     // { badgeId: cost }
+  spentPoints: raw.spentPoints || 0,
+  ecoPoints: raw.ecoPoints || 0,
+  carbonCoins: raw.carbonCoins || 0,
+  level: raw.level || 1,
+  badges: raw.badges || []
+};
+
+let activeTab = "daily";
+
+// Greet logged-in user if present
+try {
+  const user = JSON.parse(localStorage.getItem("greenAuthCurrentUser") || "null");
+  if (user && user.email) {
+    const name = user.email.split("@")[0];
+    document.getElementById("greeting").textContent = "Hi, " + name + "!";
+  }
+} catch (e) {}
+
+function recalculateAndSave() {
+  const wizardStepPts = Object.values(state.steps).reduce((s, item) => s + (item.points || 0), 0);
+  const wizardStagePts = Object.keys(state.doneStages).length * 50;
+  const missionPts = Object.values(state.completedMissions).reduce((s, p) => s + p, 0);
+
+  const totalEarned = wizardStepPts + wizardStagePts + missionPts;
+  const totalSpent = Object.values(state.purchasedBadges).reduce((s, c) => s + c, 0);
+
+  state.spentPoints = totalSpent;
+  state.ecoPoints = Math.max(0, totalEarned - totalSpent);
+  state.carbonCoins = Math.floor(totalEarned / 15);
+  state.level = Math.floor(totalEarned / 200) + 1;
+
+  // Auto-earned milestone badges
+  const autoBadges = [];
+  if (Object.keys(state.steps).length >= 1) autoBadges.push("🌱 First Blueprint Step");
+  if (Object.keys(state.steps).length >= 6) autoBadges.push("🏡 Eco Architect");
+  if (Object.keys(state.doneStages).length === 5) autoBadges.push("🏗️ Sustainable Home Master");
+  if (Object.keys(state.completedMissions).length >= 3) autoBadges.push("⚡ Mission Streaker");
+  state.badges = autoBadges;
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+  // Update Hero UI
+  document.getElementById("availPoints").textContent = state.ecoPoints;
+  document.getElementById("earnedPoints").textContent = totalEarned;
+  document.getElementById("carbonCoins").textContent = state.carbonCoins;
+
+  const title = state.purchasedBadges["shop_champion"] ? "Eco Champion" : "Eco Builder";
+  document.getElementById("rankBadge").textContent = `Level ${state.level} • ${title}`;
+
+  const progressInLevel = totalEarned % 200;
+  document.getElementById("nextLevelText").textContent = `${progressInLevel} / 200 pts to Level ${state.level + 1}`;
+  document.getElementById("levelFill").style.width = `${(progressInLevel / 200) * 100}%`;
+}
+
+function renderMissions(list, label) {
+  const doneCount = list.filter(m => state.completedMissions[m.id]).length;
+  const rows = list.map(m => {
+    const isDone = !!state.completedMissions[m.id];
+    return `
+      <div class="mission-card ${isDone ? "done" : ""}">
+        <div class="mission-left">
+          <div class="m-icon">${m.icon}</div>
+          <div>
+            <h3>${m.title}</h3>
+            <p>${m.desc}</p>
+            <span class="pts-tag">🌱 +${m.pts} Eco Points</span>
+          </div>
+        </div>
+        <button type="button" class="action-btn ${isDone ? "completed" : ""}" onclick="completeMission('${m.id}', ${m.pts})">
+          ${isDone ? "Completed ✓" : "Complete"}
+        </button>
+      </div>`;
+  }).join("");
+
+  return `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h2 class="section-title" style="margin:0;">${label}</h2>
+      <span style="font-size:13px; color:var(--muted); font-weight:600;">${doneCount}/${list.length} completed</span>
+    </div>
+    <div class="mission-list">${rows}</div>`;
+}
+
+function renderBadgesAndShop() {
+  const earnedCards = state.badges.length
+    ? state.badges.map(b => {
+        const parts = b.split(" ");
+        const emoji = parts[0];
+        const name = parts.slice(1).join(" ");
+        return `
+          <div class="badge-card owned">
+            <div>
+              <div class="b-emoji">${emoji}</div>
+              <h4>${name}</h4>
+              <p>Unlocked via Home Setup & Missions</p>
+            </div>
+            <span class="owned-pill">Earned ✓</span>
+          </div>`;
+      }).join("")
+    : `<p style="color:var(--muted); grid-column:1/-1;">Complete steps in the Home Setup Wizard or Daily Missions to earn milestone badges!</p>`;
+
+  const shopCards = SHOP_BADGES.map(item => {
+    const owned = !!state.purchasedBadges[item.id];
+    const canAfford = state.ecoPoints >= item.cost;
+    return `
+      <div class="badge-card ${owned ? "owned" : ""}">
+        <div>
+          <div class="b-emoji">${item.icon}</div>
+          <h4>${item.title}</h4>
+          <p>${item.desc}</p>
+        </div>
+        ${owned
+          ? `<span class="owned-pill">Unlocked ✓</span>`
+          : `<button type="button" class="buy-btn" ${canAfford ? "" : "disabled"} onclick="buyBadge('${item.id}', ${item.cost})">
+               Redeem • ${item.cost} pts
+             </button>`
+        }
+      </div>`;
+  }).join("");
+
+  return `
+    <h2 class="section-title">Milestone Badges Earned (${state.badges.length})</h2>
+    <div class="badges-grid">${earnedCards}</div>
+
+    <h2 class="section-title">Badge & Title Shop (Redeem Eco Points)</h2>
+    <div class="badges-grid">${shopCards}</div>`;
+}
+
+function render() {
+  recalculateAndSave();
+  const container = document.getElementById("tabContent");
+  if (activeTab === "daily") container.innerHTML = renderMissions(DAILY_MISSIONS, "Daily Eco-Missions");
+  else if (activeTab === "weekly") container.innerHTML = renderMissions(WEEKLY_MISSIONS, "Weekly Sustainability Goals");
+  else container.innerHTML = renderBadgesAndShop();
+}
+
+window.completeMission = (id, pts) => {
+  if (state.completedMissions[id]) return;
+  state.completedMissions[id] = pts;
+  render();
+};
+
+window.buyBadge = (id, cost) => {
+  if (state.purchasedBadges[id] || state.ecoPoints < cost) return;
+  state.purchasedBadges[id] = cost;
+  render();
+};
+
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeTab = btn.dataset.tab;
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
